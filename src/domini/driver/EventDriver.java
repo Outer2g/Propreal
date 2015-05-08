@@ -3,12 +3,12 @@
 
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.Vector;
 
 import domini.Data;
 import domini.Diputat;
 import domini.Event;
+import domini.NodeLouvain;
 
 	public class EventDriver {
 		private static Data data;
@@ -116,16 +116,6 @@ import domini.Event;
 			p.put(d, 9);
 			d=new Diputat("1");
 			p.put(d, 4);
-			Set<Diputat> s=p.keySet();
-			Diputat[] a= new Diputat[3];
-			s.toArray(a);
-			for(int i=0;i<a.length;++i) System.out.print(a[i].nom+" ");
-			System.out.println();
-			int[] os= new int[50];
-			os= new int[2];
-			 s.toArray(a);
-				for(int i=0;i<a.length;++i) System.out.print(a[i].nom+" ");
-				System.out.println();
 			while (n!=-1){
 				n=inputs.nextInt();
 				switch (n){

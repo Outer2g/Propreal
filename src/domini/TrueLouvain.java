@@ -7,8 +7,10 @@ import java.util.Vector;
 public class TrueLouvain extends Algorithm {
 	private Graph <Node,Edge> g;
 	private int[] n2cFinal;
+	private ArrayList <Integer>pastComms;
+	private Node[] initialNodes;
 	private class LouvainCom{
-		private Graph<Node,Edge> g;
+		private Graph<Node,Edge> gc;
 		private int size;
 		private int[] n2c;//node to community
 		private float[] in;
@@ -16,35 +18,36 @@ public class TrueLouvain extends Algorithm {
 		private Node[] node; 
 		
 		LouvainCom(Graph <Node,Edge> graph){
-			this.g=graph;
-			node=(Node[]) g.getAllNodes().toArray();
+			this.gc=graph;
+			node=(Node[]) gc.getAllNodes().toArray();
 			size=node.length;
 			n2c=new int[size];
 			in= new float[size];
 			tot= new float[size];
 			for(int i=0;i<size;++i){
 				n2c[i]=i;
-				in[i]= OpsLouvain.nb_selfloops(g, node[i]);
-				tot[i]= OpsLouvain.weighted_degree(g,node[i]);
+				in[i]= OpsLouvain.nb_selfloops(gc, node[i]);
+				tot[i]= OpsLouvain.weighted_degree(gc,node[i]);
 			}
 		}
 		
 		public void remove(int node,int comm,double linksToComm){
-			tot[comm] -=  OpsLouvain.weighted_degree(g,this.node[node]);
-			in[comm] -= 2*linksToComm +  OpsLouvain.nb_selfloops(g,this.node[node]);
+			tot[comm] -=  OpsLouvain.weighted_degree(gc,this.node[node]);
+			in[comm] -= 2*linksToComm +  OpsLouvain.nb_selfloops(gc,this.node[node]);
 			n2c[node]=-1;
 		}
 		
 		public void insert(int node,int comm,double linksToComm){
-			tot[comm] +=  OpsLouvain.weighted_degree(g,this.node[node]);
-			in[comm] += 2*linksToComm + OpsLouvain.nb_selfloops(g,this.node[node]);
+			tot[comm] +=  OpsLouvain.weighted_degree(gc,this.node[node]);
+			in[comm] += 2*linksToComm + OpsLouvain.nb_selfloops(gc,this.node[node]);
 			n2c[node]=comm;
+			
 		}
 		
 		public double modularityGain(int node,int comm, double linksToComm,double wDegree){
 			double totcom=tot[comm];
 			double degcom=wDegree;
-			double m= OpsLouvain.getTotalWeight(g);
+			double m= OpsLouvain.getTotalWeight(gc);
 			double linkscom=linksToComm;
 			double r=(linkscom-totcom*degcom/m);
 			return r;
@@ -54,8 +57,8 @@ public class TrueLouvain extends Algorithm {
 			veins=new int[size-1];
 			weights = new double[size-1];
 			for (int i=0;i<size-1;++i) weights[i]=0.0;
-			Vector<Pair<Integer,Float>> p=OpsLouvain.neighbors(g,node);
-			int degreeN=g.getAdjacentNodesTo(this.node[node]).size();
+			Vector<Pair<Integer,Float>> p=OpsLouvain.neighbors(gc,node);
+			int degreeN=gc.getAdjacentNodesTo(this.node[node]).size();
 			veins[0]=n2c[node];
 			weights[veins[0]]=0;
 			int nvecinos=1;
@@ -77,7 +80,7 @@ public class TrueLouvain extends Algorithm {
 		
 		double modularity(){
 			double q=0;
-			double m=OpsLouvain.getTotalWeight(g);
+			double m=OpsLouvain.getTotalWeight(gc);
 			for(int i=0;i<size;++i){
 				if(tot[i]>0) q+= (in[i]/m) -(tot[i]/m)*(tot[i]/m);
 			}
@@ -91,6 +94,7 @@ public class TrueLouvain extends Algorithm {
 			for(int i=0;i<size;++i){
 				communities.add(n2c[i]);
 			}
+			pastComms=communities;
 			int numeroComunitats=communities.size();
 			double [] comunitats= new double[numeroComunitats];
 			double [][] comToCom= new double[numeroComunitats][numeroComunitats];
@@ -101,14 +105,15 @@ public class TrueLouvain extends Algorithm {
 				comunitats[i]=0;
 				for(int j=0;j<numeroComunitats;++j) comToCom[i][j]=0;
 			}
+			
 			//per cada node, agafo la suma de edges que van a ell i acumulo la suma a la comunitat pertinent si els dos nodes son de la mateixa comunitat
 			//si no, acumulo la suma en el array comToCom que, per la comunitat i acumula la suma cap a la comunitat j
 			
 			for(int i=0;i<size;++i){
 				int comi=n2c[i];
 				for(int j=i;j<size;++j){
-					if(comi==n2c[j]) comunitats[comi]+= g.getEdge(node[i], node[j]).getWeight();
-					else comToCom[i][j] += g.getEdge(node[i], node[j]).getWeight();
+					if(comi==n2c[j]) comunitats[comi]+= gc.getEdge(node[i], node[j]).getWeight();
+					else comToCom[i][j] += gc.getEdge(node[i], node[j]).getWeight();
 				}
 			}
 			//Per a cada node del nou graf, li poso el edge corresponent segons elsvectors abans calculats
@@ -154,7 +159,7 @@ public class TrueLouvain extends Algorithm {
 				for(int i=0;i<size;++i){
 					int nodeid=random[i];
 					int comunitat=n2c[nodeid];
-					double weightDegree=OpsLouvain.weighted_degree(g,node[nodeid]);
+					double weightDegree=OpsLouvain.weighted_degree(gc,node[nodeid]);
 					//buscamos los links hacia otras comunidades, cogiendo su peso
 					int[] veins=new int[0];
 					double[] weights= new double[0];
@@ -201,6 +206,8 @@ public class TrueLouvain extends Algorithm {
 
 	@Override
 	public Solution algorithm(Graph<Node, Edge> g) {
+		initialNodes= new Node[0];
+		g.getAllNodes().toArray(initialNodes);
 		LouvainCom c=new LouvainCom(g);
 		boolean improvement=true;
 		double mod=c.modularity();
