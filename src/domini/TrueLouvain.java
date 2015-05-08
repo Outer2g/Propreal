@@ -97,11 +97,9 @@ public class TrueLouvain extends Algorithm {
 			}
 			
 			pastComms=communities;
-			int numeroComunitats=communities.size();
 			double [][] comToCom= new double[size][size];
 			//Per a cada comunitat creo un node al nou graf
 			for (int i=0;i<size;++i){
-				gf2.addNode( new NodeLouvain());
 				//inicialitzacions per millorar rendiment
 				for(int j=0;j<size;++j) comToCom[i][j]=0;
 			}
@@ -119,15 +117,16 @@ public class TrueLouvain extends Algorithm {
 				}
 				
 			}
-			ArrayList<Integer> com2node= new ArrayList<Integer>();
-			for(int i=0;i<size;++i){
-				com2node.add(n2c[i]);
-			}
+			int nodeDesti=0;
 			HashMap<Integer,Integer> c2n=new HashMap<Integer,Integer>();
-			for(int i=0;i<com2node.size();++i){
-				c2n.put(com2node.get(i), i);
+			for(int i=0;i<size;++i){
+				if(c2n.get(n2c[i])==null){
+					c2n.put(n2c[i],nodeDesti); 
+					++nodeDesti;
+					gf2.addNode( new NodeLouvain("com: "+nodeDesti));
+				}
 			}
-			
+			int numeroComunitats=c2n.size();
 			
 			
 			//Per a cada node del nou graf, li poso el edge corresponent segons elsvectors abans calculats
@@ -146,7 +145,6 @@ public class TrueLouvain extends Algorithm {
 					}
 				}
 			}
-			gf2.print();
 			return gf2;
 		}
 		
@@ -238,10 +236,9 @@ public class TrueLouvain extends Algorithm {
 		double newMod;
 		while(improvement){
 			improvement=c.oneLevel();
-System.out.println("After level");
-
-for(int i=0;i<c.size;++i) System.out.print(c.n2c[i]+" ");
-System.out.println();
+			System.out.println("After level");
+			for(int i=0;i<c.size;++i) System.out.print(c.n2c[i]+" ");
+			System.out.println();
 			newMod=c.modularity();
 			g=c.partition2graph();
 			c=new LouvainCom(g);
