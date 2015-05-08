@@ -56,9 +56,8 @@ public class TrueLouvain extends Algorithm {
 		}
 		
 		public int neighComm(int node,int[] veins,double[] weights){
-			veins=new int[size-1];
-			weights = new double[size-1];
-			for (int i=0;i<size-1;++i) weights[i]=0.0;
+			
+			for (int i=0;i<size;++i) weights[i]=-1.0;
 			Vector<Pair<Integer,Float>> p=OpsLouvain.neighbors(gc,node);
 			int degreeN=gc.getAdjacentNodesTo(this.node[node]).size();
 			veins[0]=n2c[node];
@@ -96,6 +95,7 @@ public class TrueLouvain extends Algorithm {
 			for(int i=0;i<size;++i){
 				communities.add(n2c[i]);
 			}
+			
 			pastComms=communities;
 			int numeroComunitats=communities.size();
 			double [][] comToCom= new double[size][size];
@@ -146,6 +146,7 @@ public class TrueLouvain extends Algorithm {
 					}
 				}
 			}
+			gf2.print();
 			return gf2;
 		}
 		
@@ -166,13 +167,14 @@ public class TrueLouvain extends Algorithm {
 				random[i]=random[rpos];
 				random[rpos]=aux;
 			}
-			mod=0;
+			mod=-newMod-1;
 			moves=1;
 			//itera mientras haya ganancia de modularidad (newMod-mod>0)
+
+			System.out.println("Pass: "+passes);
+			for(int i=0;i<size;++i) System.out.print(n2c[i]+" ");
+			System.out.println();
 			while(moves>0 && newMod-mod>0){
-				System.out.println("Pass: "+passes);
-				for(int i=0;i<size;++i) System.out.print(n2c[i]+" ");
-				System.out.println();
 				mod=newMod;
 				moves=0;
 				++passes;
@@ -181,8 +183,8 @@ public class TrueLouvain extends Algorithm {
 					int comunitat=n2c[nodeid];
 					double weightDegree=OpsLouvain.weighted_degree(gc,node[nodeid]);
 					//buscamos los links hacia otras comunidades, cogiendo su peso
-					int[] veins=new int[0];
-					double[] weights= new double[0];
+					int[] veins=new int[size];
+					double[] weights= new double[size];
 					int nvecinos= neighComm(nodeid,veins,weights);
 					//quitamos el nodo de su comunidad actual
 					remove(nodeid,comunitat,weights[comunitat]);
@@ -190,8 +192,10 @@ public class TrueLouvain extends Algorithm {
 					int bestCommunity=comunitat;
 					double linksMillor=0.0;
 					double bestIncrease=0.0;
-					for(int j=0;j<nvecinos;++i){
+					for(int j=0;j<nvecinos;++j){
 						int vei=veins[j];
+
+						
 						double millora=modularityGain(nodeid, vei, weights[vei],weightDegree);
 						if(millora>bestIncrease){
 							bestCommunity=vei;
@@ -234,6 +238,10 @@ public class TrueLouvain extends Algorithm {
 		double newMod;
 		while(improvement){
 			improvement=c.oneLevel();
+System.out.println("After level");
+
+for(int i=0;i<c.size;++i) System.out.print(c.n2c[i]+" ");
+System.out.println();
 			newMod=c.modularity();
 			g=c.partition2graph();
 			c=new LouvainCom(g);

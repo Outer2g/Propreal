@@ -15,8 +15,6 @@ public class LouvainDriver {
 		g.addEdge(nodes[1], nodes[2], new EdgeLouvain());
 		NodeLouvain[] n=new NodeLouvain[3];
 		g.getAllNodes().toArray(n);
-		for(int i=0;i<3;++i) System.out.println(n[i]+" ");
-		System.out.println(OpsLouvain.weighted_degree(g, nodes[0]));
 		TrueLouvain T= new TrueLouvain();
 		T.algorithm(g);
 	}
