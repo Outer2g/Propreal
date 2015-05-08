@@ -1,6 +1,7 @@
 package domini;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
@@ -19,7 +20,8 @@ public class TrueLouvain extends Algorithm {
 		
 		LouvainCom(Graph <Node,Edge> graph){
 			this.gc=graph;
-			node=(Node[]) gc.getAllNodes().toArray();
+			node = new Node[gc.getAllNodes().size()];
+			gc.getAllNodes().toArray(node);
 			size=node.length;
 			n2c=new int[size];
 			in= new float[size];
@@ -96,39 +98,52 @@ public class TrueLouvain extends Algorithm {
 			}
 			pastComms=communities;
 			int numeroComunitats=communities.size();
-			double [] comunitats= new double[numeroComunitats];
-			double [][] comToCom= new double[numeroComunitats][numeroComunitats];
+			double [][] comToCom= new double[size][size];
 			//Per a cada comunitat creo un node al nou graf
-			for (int i=0;i<numeroComunitats;++i){
+			for (int i=0;i<size;++i){
 				gf2.addNode( new NodeLouvain());
 				//inicialitzacions per millorar rendiment
-				comunitats[i]=0;
-				for(int j=0;j<numeroComunitats;++j) comToCom[i][j]=0;
+				for(int j=0;j<size;++j) comToCom[i][j]=0;
 			}
-			
 			//per cada node, agafo la suma de edges que van a ell i acumulo la suma a la comunitat pertinent si els dos nodes son de la mateixa comunitat
 			//si no, acumulo la suma en el array comToCom que, per la comunitat i acumula la suma cap a la comunitat j
-			
 			for(int i=0;i<size;++i){
 				int comi=n2c[i];
 				for(int j=i;j<size;++j){
-					if(comi==n2c[j]) comunitats[comi]+= gc.getEdge(node[i], node[j]).getWeight();
-					else comToCom[i][j] += gc.getEdge(node[i], node[j]).getWeight();
+					if(gc.getEdge(node[i], node[j])!=null){
+					if(comi==n2c[j]){
+						comToCom[comi][comi]+= gc.getEdge(node[i] , node[j] ).getWeight();
+					}
+					else comToCom[comi][n2c[j]] += gc.getEdge(node[i] , (Node)node[j]).getWeight();
 				}
+				}
+				
 			}
+			ArrayList<Integer> com2node= new ArrayList<Integer>();
+			for(int i=0;i<size;++i){
+				com2node.add(n2c[i]);
+			}
+			HashMap<Integer,Integer> c2n=new HashMap<Integer,Integer>();
+			for(int i=0;i<com2node.size();++i){
+				c2n.put(com2node.get(i), i);
+			}
+			
+			
+			
 			//Per a cada node del nou graf, li poso el edge corresponent segons elsvectors abans calculats
 			Node[] nodesNew= new Node[numeroComunitats];
 			gf2.getAllNodes().toArray(nodesNew);
+			EdgeLouvain e= new EdgeLouvain();
 			for(int i=0;i<numeroComunitats;++i){
-				//para [i][i] comunitats
-				EdgeLouvain e= new EdgeLouvain();
-				e.setWeight((float) comunitats[i]);
-				gf2.addEdge(nodesNew[i], nodesNew[i],e);
 				//para[i][j] comToCom
-				for(int j=0;j<numeroComunitats;++j){
-					e=new EdgeLouvain();
-					e.setWeight((float) comToCom[i][j]);
-					gf2.addEdge(nodesNew[i], nodesNew[j], e);
+				for(int j=i;j<numeroComunitats;++j){
+					if(comToCom[i][j]!=0){
+						int idnode1= c2n.get(i);
+						int idnode2=c2n.get(j);
+						e=new EdgeLouvain();
+						e.setWeight((float)comToCom[i][j] );
+						gf2.addEdge(nodesNew[idnode1], nodesNew[idnode2], e);
+					}
 				}
 			}
 			return gf2;
@@ -146,13 +161,18 @@ public class TrueLouvain extends Algorithm {
 			//ponemos a cada posicion i, la propia i para lujego hacer un shuffle entre ella en posiciones random del vector
 			for(int i=0;i<size;++i)random[i]=i;
 			for(int i=0;i<size;++i){
-				int rpos= r.nextInt()%(size-1);
+				int rpos= r.nextInt(size);
 				int aux= random[i];
 				random[i]=random[rpos];
 				random[rpos]=aux;
 			}
+			mod=0;
+			moves=1;
 			//itera mientras haya ganancia de modularidad (newMod-mod>0)
 			while(moves>0 && newMod-mod>0){
+				System.out.println("Pass: "+passes);
+				for(int i=0;i<size;++i) System.out.print(n2c[i]+" ");
+				System.out.println();
 				mod=newMod;
 				moves=0;
 				++passes;

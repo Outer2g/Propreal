@@ -3,7 +3,7 @@ package domini;
 public class EdgeLouvain extends Edge {
 	float weight;
 	public EdgeLouvain() {
-		
+		weight=1;
 	}
 
 	@Override
