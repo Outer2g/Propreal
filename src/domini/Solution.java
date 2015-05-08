@@ -1,0 +1,9 @@
+package domini;
+
+public class Solution {
+
+	public Solution() {
+		// TODO Auto-generated constructor stub
+	}
+
+}
