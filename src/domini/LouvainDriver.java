@@ -46,8 +46,7 @@ public class LouvainDriver {
 		Graph <Node,Edge> g;
 		int n=0;
 		Scanner inputs=new Scanner(System.in);
-		tryGraph2();
-		/*while(n!=-1){
+		while(n!=-1){
 			n=inputs.nextInt();
 			switch(n){
 			case 1:
@@ -59,7 +58,7 @@ public class LouvainDriver {
 			case 3: tryGraph3(); break;
 			}
 			
-		}*/
+		}
 		
 	}
 
