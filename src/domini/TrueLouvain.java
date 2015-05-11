@@ -11,6 +11,7 @@ public class TrueLouvain extends Algorithm {
 	private ArrayList <Integer>pastComms;
 	private HashMap <Integer,Integer> lastConversion;
 	private Node[] initialNodes;
+	private int level;
 	private class LouvainCom{
 		private Graph<Node,Edge> gc;
 		private int size;
@@ -129,14 +130,22 @@ public class TrueLouvain extends Algorithm {
 				}
 				
 			}
+			//track dels nodes inicials
 			int numeroComunitats=c2n.size();
 			Node[] nodesNew= new Node[numeroComunitats];
 			gf2.getAllNodes().toArray(nodesNew);
+			if(level==0){
 				for(int i=0;i<size;++i) {
 					NodeLouvain n= (NodeLouvain) nodesNew[c2n.get(n2c[i])];
 					n.addIdNode(i);
 				}
-			
+			}
+			else {
+				for(int i=0;i<size;++i){
+					NodeLouvain n=(NodeLouvain) nodesNew[c2n.get(n2c[i])];
+					n.copyNodes(n);
+				}
+			}
 			
 			
 			
@@ -244,6 +253,7 @@ public class TrueLouvain extends Algorithm {
 		boolean improvement=true;
 		double mod=c.modularity();
 		double newMod;
+		level=0;
 		while(improvement){
 			improvement=c.oneLevel();
 			System.out.println("After level");
@@ -253,6 +263,7 @@ public class TrueLouvain extends Algorithm {
 			g=c.partition2graph();
 			c=new LouvainCom(g);
 			mod=newMod;
+			++level;
 		}
 		NodeLouvain[] comunitatsFinals=new NodeLouvain[g.getAllNodes().size()];
 		g.getAllNodes().toArray(comunitatsFinals);
