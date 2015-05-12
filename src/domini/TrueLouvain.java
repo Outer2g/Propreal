@@ -8,21 +8,21 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 public class TrueLouvain extends Algorithm {
-	private Graph <Node,Edge> g;
+	private Graph <Node> g;
 	private int[] n2cFinal;
 	private ArrayList <Integer>pastComms;
 	private HashMap <Integer,Integer> lastConversion;
 	private Node[] initialNodes;
 	private int level;
 	private class LouvainCom{
-		private Graph<Node,Edge> gc;
+		private Graph<Node> gc;
 		private int size;
 		private int[] n2c;//node to community
 		private float[] in;
 		private float[] tot;
 		private Node[] node; 
 		
-		LouvainCom(Graph <Node,Edge> graph){
+		LouvainCom(Graph <Node> graph){
 			this.gc=graph;
 			node = new Node[gc.getAllNodes().size()];
 			gc.getAllNodes().toArray(node);
@@ -92,9 +92,9 @@ public class TrueLouvain extends Algorithm {
 			return q;
 		}
 		
-		public Graph<Node,Edge> partition2graph(){
-			
-			Graph<Node,Edge> gf2=new Graph<Node,Edge>();
+		public Graph<Node> partition2graph(){
+			if (level==0)n2cFinal=n2c;
+			Graph<Node> gf2=new Graph<Node>();
 			ArrayList <Integer> communities= new ArrayList<Integer>();
 			//per a cada node, faig add de la seva comunitat al arraylist communities(per l'implementacio de l'add, no tindre repetides)
 			for(int i=0;i<size;++i){
@@ -132,35 +132,28 @@ public class TrueLouvain extends Algorithm {
 				}
 				
 			}
+
 			//track dels nodes inicials
 			int numeroComunitats=c2n.size();
 			Node[] nodesNew= new Node[numeroComunitats];
 			gf2.getAllNodes().toArray(nodesNew);
-			if(level==0){
-				for(int i=0;i<size;++i) {
-					NodeLouvain n= (NodeLouvain) nodesNew[c2n.get(n2c[i])];
-					n.addIdNode(i);
+			
+				for(int i=0;i<n2cFinal.length;++i){
+					n2cFinal[i]=c2n.get(n2cFinal[i]);
 				}
-			}
-			else {
-				for(int i=0;i<size;++i){
-					NodeLouvain n=(NodeLouvain) nodesNew[c2n.get(n2c[i])];
-					n.copyNodes(n);
-				}
-			}
 			
 			
 			
 			//Per a cada node del nou graf, li poso el edge corresponent segons elsvectors abans calculats
 			
-			EdgeLouvain e= new EdgeLouvain();
+			Edge e= new Edge();
 			for(int i=0;i<numeroComunitats;++i){
 				//para[i][j] comToCom
 				for(int j=i;j<numeroComunitats;++j){
 					if(comToCom[i][j]!=0){
 						int idnode1= c2n.get(i);
 						int idnode2=c2n.get(j);
-						e=new EdgeLouvain();
+						e=new Edge();
 						e.setWeight((float)comToCom[i][j] );
 						gf2.addEdge(nodesNew[idnode1], nodesNew[idnode2], e);
 					}
@@ -190,9 +183,6 @@ public class TrueLouvain extends Algorithm {
 			moves=1;
 			//itera mientras haya ganancia de modularidad (newMod-mod>0)
 
-			System.out.println("Pass: "+passes);
-			for(int i=0;i<size;++i) System.out.print(n2c[i]+" ");
-			System.out.println();
 			while(moves>0 && newMod-mod>0){
 				mod=newMod;
 				moves=0;
@@ -248,9 +238,10 @@ public class TrueLouvain extends Algorithm {
 	}
 
 	@Override
-	public Solution algorithm(Graph<Node, Edge> g) {
+	public Solution algorithm(Graph<Node> g) {
 		long startTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis();
 		initialNodes= new Node[g.getAllNodes().size()];
+		n2cFinal= new int[g.getAllNodes().size()];
 		g.getAllNodes().toArray(initialNodes);
 		LouvainCom c=new LouvainCom(g);
 		boolean improvement=true;
@@ -259,9 +250,6 @@ public class TrueLouvain extends Algorithm {
 		level=0;
 		while(improvement){
 			improvement=c.oneLevel();
-			System.out.println("After level");
-			for(int i=0;i<c.size;++i) System.out.print(c.n2c[i]+" ");
-			System.out.println();
 			newMod=c.modularity();
 			g=c.partition2graph();
 			c=new LouvainCom(g);
@@ -275,13 +263,13 @@ public class TrueLouvain extends Algorithm {
 		s.setTime(genTime);
 		NodeLouvain[] comunitatsFinals=new NodeLouvain[g.getAllNodes().size()];
 		g.getAllNodes().toArray(comunitatsFinals);
-		Community p;
-		for(int i=0;i<comunitatsFinals.length;++i){
-			p=new Community();
-			for(int j=0;j<comunitatsFinals[i].getNodes().size();++j) p.addNode(initialNodes[comunitatsFinals[i].getNodes().get(j)]);
-			s.addCommunity(p);
-			
+		Community[] p= new Community[comunitatsFinals.length];
+		for(int i=0;i<p.length;++i) p[i]=new Community();
+		for(int i=0;i<n2cFinal.length;++i){
+			p[n2cFinal[i]].addNode(initialNodes[i]);
 		}
+		for(int i=0;i<p.length;++i)s.addCommunity(p[i]);
+		
 		return s;
 	}
 

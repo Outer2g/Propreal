@@ -1,11 +1,12 @@
 package domini;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class LouvainDriver {
 	private static void tryGraph() {
-		Graph <Node,Edge> g= new Graph <Node,Edge>();
+		Graph <Node> g= new Graph <Node>();
 		for(int i=0;i<3;++i) g.addNode(new NodeLouvain(String.valueOf(i)));
 		Node[] nodes=new Node[3];
 		g.getAllNodes().toArray(nodes);
@@ -17,10 +18,24 @@ public class LouvainDriver {
 		NodeLouvain[] n=new NodeLouvain[3];
 		g.getAllNodes().toArray(n);
 		TrueLouvain T= new TrueLouvain();
-		T.algorithm(g);
+		Solution s=T.algorithm(g);
+
+		System.out.println("comms");
+		for(int i=0;i<s.getNumCommunities();++i){
+			ArrayList<Community> p= s.getCommunities();
+			System.out.println("com : " +i);
+			for(int j=0;j<p.size();++j){
+				Community pp= p.get(i);
+				System.out.println("numbernodes: "+pp.getNumberOfNodes());
+				List<Node> ns=pp.getCommunity();
+				for(int x=0;x<pp.getNumberOfNodes();++x){
+					System.out.print(ns.get(x).getId()+" ");
+				}
+			}
+		}
 	}
 	private static void tryGraph2(){
-		Graph<Node,Edge> g= new Graph<Node,Edge>();
+		Graph<Node> g= new Graph<Node>();
 		for(int i=0;i<6;++i)g.addNode(new NodeLouvain(String.valueOf(i)));
 		Node[] nodes = new Node[6];
 		g.getAllNodes().toArray(nodes);
@@ -35,24 +50,32 @@ public class LouvainDriver {
 		g.addEdge(nodes[4], nodes[5], e);
 		NodeLouvain[] n =new NodeLouvain[6];
 		g.getAllNodes().toArray(n);
-		g.print();
 		TrueLouvain T=new TrueLouvain();
 		Solution s=T.algorithm(g);
+		System.out.println("comms: "+ s.getNumCommunities());
 		for(int i=0;i<s.getNumCommunities();++i){
 			ArrayList<Community> p= s.getCommunities();
-			for(int j=0;j<p.size();++j) {
-				
+			System.out.println("com : " +i);
+			for(int j=0;j<p.size();++j){
+				Community pp= p.get(i);
+				System.out.println("numbernodes: "+pp.getNumberOfNodes());
+				List<Node> ns=pp.getCommunity();
+				for(int x=0;x<pp.getNumberOfNodes();++x){
+					System.out.print(ns.get(x).getId()+" ");
+				}
+				System.out.println();
 			}
 		}
+		System.out.println(s.getTime());
 	}
 	private static void tryGraph3(){
-		Graph<Node,Edge> g= new Graph<Node,Edge>();
+		Graph<Node> g= new Graph<Node>();
 		TrueLouvain T= new TrueLouvain();
 		T.algorithm(g);
 	}
 
 	public static void main(String[] args) {
-		Graph <Node,Edge> g;
+		Graph <Node> g;
 		int n=0;
 		Scanner inputs=new Scanner(System.in);
 		while(n!=-1){

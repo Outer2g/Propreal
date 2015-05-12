@@ -18,14 +18,5 @@ public class NodeLouvain extends Node {
 	public String getId() {
 		return s;
 	}
-	public void addIdNode(int i){
-		nodes.add(i);
-	}
-	public ArrayList<Integer> getNodes(){
-		return (ArrayList<Integer>) nodes.clone();
-	}
-	public void copyNodes(NodeLouvain n){
-		this.nodes=n.getNodes();
-	}
 
 }
