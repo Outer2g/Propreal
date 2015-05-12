@@ -7,11 +7,8 @@ import java.util.Random;
 import java.util.TimeZone;
 import java.util.Vector;
 
-public class TrueLouvain extends Algorithm {
-	private Graph <Node> g;
+public class Louvain extends Algorithm {
 	private int[] n2cFinal;
-	private ArrayList <Integer>pastComms;
-	private HashMap <Integer,Integer> lastConversion;
 	private Node[] initialNodes;
 	private int level;
 	private class LouvainCom{
@@ -101,7 +98,6 @@ public class TrueLouvain extends Algorithm {
 				communities.add(n2c[i]);
 			}
 			
-			pastComms=communities;
 			double [][] comToCom= new double[size][size];
 			//Per a cada comunitat creo un node al nou graf
 			for (int i=0;i<size;++i){
@@ -233,7 +229,7 @@ public class TrueLouvain extends Algorithm {
 		
 		
 	}
-	public TrueLouvain() {
+	public Louvain() {
 		
 	}
 
