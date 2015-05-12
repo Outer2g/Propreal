@@ -1,5 +1,6 @@
 package domini;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class LouvainDriver {
@@ -36,10 +37,18 @@ public class LouvainDriver {
 		g.getAllNodes().toArray(n);
 		g.print();
 		TrueLouvain T=new TrueLouvain();
-		T.algorithm(g);
+		Solution s=T.algorithm(g);
+		for(int i=0;i<s.getNumCommunities();++i){
+			ArrayList<Community> p= s.getCommunities();
+			for(int j=0;j<p.size();++j) {
+				
+			}
+		}
 	}
 	private static void tryGraph3(){
-		
+		Graph<Node,Edge> g= new Graph<Node,Edge>();
+		TrueLouvain T= new TrueLouvain();
+		T.algorithm(g);
 	}
 
 	public static void main(String[] args) {

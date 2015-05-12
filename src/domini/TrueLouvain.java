@@ -1,8 +1,10 @@
 package domini;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.Vector;
 
 public class TrueLouvain extends Algorithm {
@@ -247,6 +249,7 @@ public class TrueLouvain extends Algorithm {
 
 	@Override
 	public Solution algorithm(Graph<Node, Edge> g) {
+		long startTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis();
 		initialNodes= new Node[g.getAllNodes().size()];
 		g.getAllNodes().toArray(initialNodes);
 		LouvainCom c=new LouvainCom(g);
@@ -265,9 +268,13 @@ public class TrueLouvain extends Algorithm {
 			mod=newMod;
 			++level;
 		}
+
+		long genTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis() - startTime;
+		Solution s=new Solution();
+		s.setAlg('L');
+		s.setTime(genTime);
 		NodeLouvain[] comunitatsFinals=new NodeLouvain[g.getAllNodes().size()];
 		g.getAllNodes().toArray(comunitatsFinals);
-		Solution s=new Solution();
 		Community p;
 		for(int i=0;i<comunitatsFinals.length;++i){
 			p=new Community();
