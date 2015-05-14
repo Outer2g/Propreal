@@ -65,9 +65,9 @@ public class Louvain extends Algorithm {
 			weights[veins[0]]=0;
 			int nvecinos=1;
 			for(int i=0;i<degreeN;++i){
-				int neigh=p.get(i).GetFirst();
+				int neigh=p.get(i).getFirst();
 				int neighCom=n2c[neigh];
-				double neighW=p.get(i).GetSecond();
+				double neighW=p.get(i).getSecond();
 				if(neigh!=node){
 					if(weights[neighCom]==-1){
 						weights[neighCom]=0.0;
@@ -216,7 +216,7 @@ public class Louvain extends Algorithm {
 					}
 					
 				}
-				newMod=modularity();
+				if (moves>0)newMod=modularity();
 				
 			}
 			return improvement;

@@ -18,7 +18,7 @@ public class LouvainDriver {
 		NodeLouvain[] n=new NodeLouvain[3];
 		g.getAllNodes().toArray(n);
 		Louvain T= new Louvain();
-		Solution s=T.algorithm(g);
+		Solution s=T.getSolution(g);
 
 		System.out.println("comms");
 		for(int i=0;i<s.getNumCommunities();++i){
@@ -51,7 +51,7 @@ public class LouvainDriver {
 		NodeLouvain[] n =new NodeLouvain[6];
 		g.getAllNodes().toArray(n);
 		Louvain T=new Louvain();
-		Solution s=T.algorithm(g);
+		Solution s=T.getSolution(g);
 		System.out.println("comms: "+ s.getNumCommunities());
 		for(int i=0;i<s.getNumCommunities();++i){
 			ArrayList<Community> p= s.getCommunities();
@@ -71,7 +71,7 @@ public class LouvainDriver {
 	private static void tryGraph3(){
 		Graph<Node> g= new Graph<Node>();
 		Louvain T= new Louvain();
-		T.algorithm(g);
+		T.getSolution(g);
 	}
 
 	public static void main(String[] args) {

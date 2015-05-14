@@ -1,5 +1,5 @@
 package domini;
 
 public abstract class Algorithm {
-	public abstract Solution algorithm(Graph<Node> g);
+	public abstract Solution getSolution(Graph<Node> g);
 }
