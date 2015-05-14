@@ -216,12 +216,7 @@ public class Louvain extends Algorithm {
 					}
 					
 				}
-				double totalTot=0.0;
-				double totalIn=0.0;
-				for(int i=0;i<tot.length;++i){
-					totalTot+=tot[i];
-					totalIn+=in[i];
-				}
+				newMod=modularity();
 				
 			}
 			return improvement;
@@ -234,7 +229,7 @@ public class Louvain extends Algorithm {
 	}
 
 	@Override
-	public Solution algorithm(Graph<Node> g) {
+	public Solution getSolution(Graph<Node> g) {
 		long startTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis();
 		initialNodes= new Node[g.getAllNodes().size()];
 		n2cFinal= new int[g.getAllNodes().size()];
