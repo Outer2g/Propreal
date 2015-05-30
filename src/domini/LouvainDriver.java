@@ -77,6 +77,8 @@ public class LouvainDriver {
 	public static void main(String[] args) {
 		Graph <Node> g;
 		int n=0;
+		boolean b=true;
+		while(b) tryGraph2();
 		Scanner inputs=new Scanner(System.in);
 		while(n!=-1){
 			n=inputs.nextInt();

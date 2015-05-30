@@ -1,7 +1,6 @@
 package domini;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.TimeZone;
@@ -135,7 +134,7 @@ public class Louvain extends Algorithm {
 			gf2.getAllNodes().toArray(nodesNew);
 			
 				for(int i=0;i<n2cFinal.length;++i){
-					n2cFinal[i]=c2n.get(n2cFinal[i]);
+					if(c2n.get(n2cFinal[i])!=null)n2cFinal[i]=c2n.get(n2cFinal[i]);
 				}
 			
 			
@@ -230,7 +229,7 @@ public class Louvain extends Algorithm {
 
 	@Override
 	public Solution getSolution(Graph<Node> g) {
-		long startTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis();
+		long startTime = System.nanoTime();
 		initialNodes= new Node[g.getAllNodes().size()];
 		n2cFinal= new int[g.getAllNodes().size()];
 		g.getAllNodes().toArray(initialNodes);
@@ -248,9 +247,10 @@ public class Louvain extends Algorithm {
 			++level;
 		}
 
-		long genTime = Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis() - startTime;
+		long genTime = System.nanoTime() - startTime;
 		Solution s=new Solution();
 		s.setAlg('L');
+		System.out.println("Time: "+genTime);
 		s.setTime(genTime);
 		NodeLouvain[] comunitatsFinals=new NodeLouvain[g.getAllNodes().size()];
 		g.getAllNodes().toArray(comunitatsFinals);
