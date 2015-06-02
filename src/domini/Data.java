@@ -30,6 +30,10 @@ public class Data {
 	public int getDia(){
 		return this.dia;
 	}
+	public String getData(){
+		String s=dia+"-"+mes+"-"+any;
+		return s;
+	}
 	public int getMes(){
 		return this.mes;
 	}
